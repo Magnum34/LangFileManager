@@ -8,6 +8,9 @@ use Backpack\LangFileManager\app\Services\LangFiles;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\LangFileManager\app\Http\Requests\LanguageRequest;
 
+use Illuminate\Http\File;
+use Backpack\LangFileManager\app\Until\GenerateCRUDConfig;
+
 class LanguageCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
@@ -18,6 +21,7 @@ class LanguageCrudController extends CrudController
 
     public function setup()
     {
+
         $this->crud->setModel("Backpack\LangFileManager\app\Models\Language");
         $this->crud->setRoute(config('backpack.base.route_prefix', 'admin').'/language');
         $this->crud->setEntityNameStrings(trans('backpack::langfilemanager.language'), trans('backpack::langfilemanager.languages'));
@@ -91,6 +95,12 @@ class LanguageCrudController extends CrudController
         // Copy the default language folder to the new language folder
         \File::copyDirectory(resource_path('lang/'.$defaultLang->abbr), resource_path('lang/'.request()->input('abbr')));
 
+
+        $generate = new GenerateCRUDConfig();
+        $generate->write();
+        $generate->generateUploadFile(request()->input('name'), request()->input('abbr'));
+
+
         return $this->traitStore();
     }
 
@@ -108,6 +118,10 @@ class LanguageCrudController extends CrudController
 
         if ($destroyResult) {
             \File::deleteDirectory(resource_path('lang/'.$language->abbr));
+
+            $generate = new GenerateCRUDConfig();
+            $generate->generateDestroyLanguageUploadFile($language->abbr);
+
         }
 
         return $destroyResult;
