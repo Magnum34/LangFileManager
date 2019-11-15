@@ -25,6 +25,7 @@ class LanguageCrudController extends CrudController
         $this->crud->setModel("Backpack\LangFileManager\app\Models\Language");
         $this->crud->setRoute(config('backpack.base.route_prefix', 'admin').'/language');
         $this->crud->setEntityNameStrings(trans('backpack::langfilemanager.language'), trans('backpack::langfilemanager.languages'));
+
     }
 
     public function setupListOperation()
@@ -99,6 +100,7 @@ class LanguageCrudController extends CrudController
         $generate = new GenerateCRUDConfig();
         $generate->write();
         $generate->generateUploadFile(request()->input('name'), request()->input('abbr'));
+
 
 
         return $this->traitStore();
